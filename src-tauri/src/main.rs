@@ -12,8 +12,8 @@ async fn greet() -> Vec<scraping::EventDetail> {
     dotenv().ok();
 
     let key = "WX_SEL";
-    let root_selectors: Vec<String> = dotenv::var(key).unwrap_or("detail_cont_inner_fukuoka".to_string()).split(',').into_iter().map(|s| s.trim().to_owned()).collect();
-    println!("{:?}", &root_selectors);
+    let root_selectors: Vec<String> = dotenv::var(key).unwrap_or("fukuoka".to_string()).split(',').into_iter().map(|s| s.trim().to_owned()).collect();
+
     scraping::use_cache_or_fetch(root_selectors).await.unwrap()
 }
 
