@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::fs;
 use std::fs::File;
@@ -13,7 +14,7 @@ use chrono::prelude::*;
 use chrono_tz::Asia::Tokyo;
 use serde::{Deserialize, Serialize};
 
-pub async fn use_cache_or_fetch() -> Result<Vec<EventDetail>, Box<dyn std::error::Error>> {
+pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<EventDetail>, Box<dyn std::error::Error>> {
     let cache_dir = "./cache";
     let cache_filename = format!("{}.txt", get_today());
 
@@ -38,16 +39,34 @@ pub async fn use_cache_or_fetch() -> Result<Vec<EventDetail>, Box<dyn std::error
         }
     };
 
-    let selector = "#detail_cont_inner_fukuoka .event_box";
+    let mut event_details: Vec<EventDetail> = Vec::new();
+
     let document: Html = Html::parse_document(&body);
-    let main_selector: Selector = Selector::parse(selector).unwrap();
 
-    // let content = document.select(&main_selector).next().map(|element| element.inner_html()).unwrap();
-    let events: Vec<EventDetail> = document.select(&main_selector).into_iter().map(|c| {
-        parse_event(&c.inner_html())
-    }).collect();
+    let mut con_map: HashMap<String, String> = HashMap::new();
 
-    Ok(events)
+    root_selector.iter().for_each(|s| {
+        let con_name = con_map.get(s);
+        let con_name = match con_name {
+            Some(con_name) => con_name.clone(),
+            None => {
+                let con = format!("#option_{}", s);
+                let con_selector: Selector = Selector::parse(&con).unwrap();
+                let con_name = document.select(&con_selector).next().unwrap().inner_html();
+                con_map.insert(s.clone(), con_name.clone());
+                con_name
+            }
+        };
+
+        let selector = format!("#detail_cont_inner_{} .event_box", s).as_str().to_owned();
+        let main_selector: Selector = Selector::parse(&selector).unwrap();
+
+        // let content = document.select(&main_selector).next().map(|element| element.inner_html()).unwrap();
+        document.select(&main_selector).into_iter().for_each(|c| {
+            event_details.push(parse_event(&c.inner_html(), con_name.clone()))
+        });
+    });
+    Ok(event_details)
 
     // for e in events {
     //     println!("{}\n", e);
@@ -71,6 +90,7 @@ async fn save_to_cache(cache_dir: &str, cache_filename: &str, content: &str) -> 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EventDetail {
     name: String,
+    con: String,
     shop_name: String,
     shop_link: String,
     time: String,
@@ -84,7 +104,7 @@ impl Display for EventDetail {
     }
 }
 
-fn parse_event<'a>(src: &'a str) -> EventDetail {
+fn parse_event<'a>(src: &'a str, con_name: String) -> EventDetail {
     let html = Html::parse_document(src);
     let selector_event_name: Selector = Selector::parse("dd.event_name").unwrap();
     let selector_shop_name: Selector = Selector::parse("dd.shop_name a").unwrap();
@@ -105,6 +125,7 @@ fn parse_event<'a>(src: &'a str) -> EventDetail {
 
     EventDetail {
         name: extract_text(&selector_event_name),
+        con: con_name,
         shop_name: extract_text(&selector_shop_name),
         shop_link: html.select(&selector_shop_name).next().unwrap().value().attr("href").unwrap_or("").to_string(),
         time: extract_text(&selector_time),
