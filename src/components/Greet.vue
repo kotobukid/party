@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {onMounted, ref, type Ref} from "vue";
 import {invoke} from "@tauri-apps/api/tauri";
 
 const greetMsg: Ref<EventDetail[]> = ref([]);
