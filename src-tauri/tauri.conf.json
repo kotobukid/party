@@ -21,7 +21,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "jp.daqua.party",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -38,7 +38,7 @@
         "fullscreen": false,
         "resizable": true,
         "title": "party",
-        "width": 800,
+        "width": 1200,
         "height": 600
       }
     ]
