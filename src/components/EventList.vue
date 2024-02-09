@@ -2,7 +2,7 @@
 import {onMounted, ref, type Ref} from "vue";
 import {invoke} from "@tauri-apps/api/tauri";
 
-const greetMsg: Ref<Record<string, EventDetail[]>> = ref({});
+const events_dict: Ref<Record<string, EventDetail[]>> = ref({});
 
 type EventDetail = {
   name: string,
@@ -15,8 +15,7 @@ type EventDetail = {
 }
 
 onMounted(async () => {
-  const events: EventDetail[] = await invoke("greet");
-  console.log(events);
+  const events: EventDetail[] = await invoke("fetch_events");
 
   // イベントをdatetimeでソート
   const sortedEvents = events.sort((a, b) => {
@@ -44,7 +43,7 @@ onMounted(async () => {
   }, {} as { [key: string]: EventDetail[] });
 
   // groupedEventsは、日付をキーとしたオブジェクトで、その値がイベントの配列
-  greetMsg.value = groupedEvents;
+  events_dict.value = groupedEvents;
 });
 
 </script>
@@ -65,7 +64,7 @@ onMounted(async () => {
       <th>イベント名</th>
     </tr>
     </thead>
-    <tbody v-for="(events, date) in greetMsg" :key="date">
+    <tbody v-for="(events, date) in events_dict" :key="date">
     <tr v-for="event in events" :key="event.name">
       <td :data-format="event.format">{{ event.format }}</td>
       <td>{{ event.time_s }}</td>

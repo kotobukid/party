@@ -8,7 +8,7 @@ use std::env;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-async fn greet() -> Vec<scraping::EventDetail> {
+async fn fetch_events() -> Vec<scraping::EventDetail> {
     dotenv().ok();
 
     let key = "WX_SEL";
@@ -20,7 +20,7 @@ async fn greet() -> Vec<scraping::EventDetail> {
 #[tokio::main]
 async fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![fetch_events])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
