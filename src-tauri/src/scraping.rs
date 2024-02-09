@@ -13,6 +13,9 @@ extern crate chrono_tz;
 use chrono::prelude::*;
 use chrono_tz::Asia::Tokyo;
 use serde::{Deserialize, Serialize};
+extern crate party;
+
+use party::parse_and_adjust_date;
 
 pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<EventDetail>, Box<dyn std::error::Error>> {
     let cache_dir = "./cache";
@@ -93,7 +96,8 @@ pub struct EventDetail {
     con: String,
     shop_name: String,
     shop_link: String,
-    time: String,
+    time_s: String,
+    datetime: DateTime<Local>,
     format: String,
 }
 
@@ -122,13 +126,15 @@ fn parse_event<'a>(src: &'a str, con_name: String) -> EventDetail {
         }
         extracted_text
     };
-
+    let time: String = extract_text(&selector_time);
+    println!("{}", time);
     EventDetail {
         name: extract_text(&selector_event_name),
         con: con_name,
         shop_name: extract_text(&selector_shop_name),
         shop_link: html.select(&selector_shop_name).next().unwrap().value().attr("href").unwrap_or("").to_string(),
-        time: extract_text(&selector_time),
+        time_s: time.clone(),
+        datetime: parse_and_adjust_date(&time.trim_end_matches('〜')),
         format: extract_text(&selector_format),
     }
 }
