@@ -6,7 +6,8 @@ const props = defineProps<{
 }>();
 
 const show_limit_changed = (e: InputEvent) => {
-  const limit = Number(e.target.value!);
+  // @ts-ignore
+  const limit = Number(e.target!.value!);
 
   emit('limit-changed', limit);
 }
