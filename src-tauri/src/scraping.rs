@@ -127,7 +127,7 @@ fn parse_event<'a>(src: &'a str, con_name: String) -> EventDetail {
         extracted_text
     };
     let time: String = extract_text(&selector_time);
-    println!("{}", time);
+
     EventDetail {
         name: extract_text(&selector_event_name),
         con: con_name,
