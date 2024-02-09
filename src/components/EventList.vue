@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import {onMounted, ref, type Ref} from "vue";
+import {computed, onMounted, ref, type Ref} from "vue";
 import {invoke} from "@tauri-apps/api/tauri";
 
-const events_dict: Ref<Record<string, EventDetail[]>> = ref({});
+const props = defineProps<{
+  show_limit: number
+}>()
+
+console.log(props.show_limit);
 
 type EventDetail = {
   name: string,
@@ -12,15 +16,24 @@ type EventDetail = {
   time_s: string,
   datetime: Date,
   format: string,
-}
+};
+
+const events_all: Ref<EventDetail[]> = ref([]);
 
 onMounted(async () => {
   const events: EventDetail[] = await invoke("fetch_events");
+  events_all.value = events;
+});
 
+
+const events_to_show = computed((): Record<string, EventDetail[]> => {
   const now = new Date();
-  const threeDaysLater = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30);
 
-  const filteredAndSortedEvents = events
+  const limit = props.show_limit === 0 ? 30 : props.show_limit + 1;
+
+  const threeDaysLater = new Date(now.getFullYear(), now.getMonth(), now.getDate() + limit);
+
+  const filteredAndSortedEvents = events_all.value
       .filter(event => {
         const eventDate = new Date(event.datetime);
         return eventDate >= now && eventDate <= threeDaysLater;
@@ -46,11 +59,8 @@ onMounted(async () => {
 
     return groups;
   }, {} as { [key: string]: EventDetail[] });
-
-  // groupedEventsは、日付をキーとしたオブジェクトで、その値がイベントの配列
-  events_dict.value = groupedEvents;
+  return groupedEvents;
 });
-
 </script>
 
 <template>
@@ -69,7 +79,10 @@ onMounted(async () => {
       <th>イベント名</th>
     </tr>
     </thead>
-    <tbody v-for="(events, date) in events_dict" :key="date">
+    <tbody v-for="(events, date) in events_to_show" :key="date">
+    <tr class="date">
+      <td colspan="4">{{ date }}</td>
+    </tr>
     <tr v-for="event in events" :key="event.name">
       <td :data-format="event.format">{{ event.format }}</td>
       <td>{{ event.time_s }}</td>
@@ -88,6 +101,12 @@ table {
   width: 1170px;
   table-layout: fixed;
   border-collapse: collapse;
+}
+
+tr.date td {
+  background-color: #868686;
+  color: white;
+  font-weight: bold;
 }
 
 th, td {

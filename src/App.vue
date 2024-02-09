@@ -1,21 +1,37 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
+import {ref, type Ref} from "vue";
+
 import EventList from "./components/EventList.vue";
+import AppConfiguration from "./components/AppConfiguration.vue";
+
+const show_config: Ref<boolean> = ref(false);
+const show_limit: Ref<number> = ref(0);
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'F1') {
+    show_config.value = !show_config.value;
+    event.preventDefault(); // ブラウザのデフォルトの挙動をキャンセル
+  }
+});
 </script>
 
 <template>
-<div class="container">
-    <EventList/>
-</div>
+  <div class="container">
+    <AppConfiguration
+        v-if="show_config"
+        :show_limit="show_limit"
+        @limit-changed="(l) => {show_limit = l}"
+    ></AppConfiguration>
+    <EventList :show_limit="show_limit"/>
+  </div>
 </template>
 
 <style scoped>
 .logo.vite:hover {
-    filter: drop-shadow(0 0 2em #747bff);
+  filter: drop-shadow(0 0 2em #747bff);
 }
 
 .logo.vue:hover {
-    filter: drop-shadow(0 0 2em #249b73);
+  filter: drop-shadow(0 0 2em #249b73);
 }
 </style>
