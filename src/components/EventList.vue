@@ -17,18 +17,23 @@ type EventDetail = {
 onMounted(async () => {
   const events: EventDetail[] = await invoke("fetch_events");
 
-  // イベントをdatetimeでソート
-  const sortedEvents = events.sort((a, b) => {
-    // 文字列からDateオブジェクトを生成
-    const dateA = new Date(a.datetime);
-    const dateB = new Date(b.datetime);
+  const now = new Date();
+  const threeDaysLater = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30);
 
-    // getTime()を使用してミリ秒で比較し、ソート
-    return dateA.getTime() - dateB.getTime();
-  });
+  const filteredAndSortedEvents = events
+      .filter(event => {
+        const eventDate = new Date(event.datetime);
+        return eventDate >= now && eventDate <= threeDaysLater;
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.datetime);
+        const dateB = new Date(b.datetime);
+        return dateA.getTime() - dateB.getTime();
+      });
+
 
   // イベントを年月日でグルーピング
-  const groupedEvents = sortedEvents.reduce((groups, event) => {
+  const groupedEvents = filteredAndSortedEvents.reduce((groups, event) => {
     const dateKey = new Date(event.datetime).toISOString().split('T')[0];
 
     // グループにこの日付がまだ存在しない場合は、空の配列を用意
