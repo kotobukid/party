@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import {onMounted} from "vue";
+
 const emit = defineEmits([
     'limit-changed',
     'regular-wp-changed',
@@ -20,12 +22,11 @@ const show_limit_changed = (e: InputEvent) => {
 
 const regular_wp_changed = (e: InputEvent) => {
   // @ts-ignore
-  const limit = Number(e.target!.value!);
+  const regular_wp = Number(e.target!.value!);
 
-  emit('regular-wp-changed', limit);
+  emit('regular-wp-changed', regular_wp);
 }
 const format_changed = (format: 0 | 1 | 2 | 3) => {
-
   emit('format-changed', format);
 }
 </script>

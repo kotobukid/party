@@ -67,7 +67,6 @@ const events_to_show = computed((): Record<string, EventDetail[]> => {
   const filteredAndSortedEvents = events_all.value
       .filter(event => {
         const eventDate = new Date(event.datetime);
-        console.log(event.format)
         return (eventDate >= now && eventDate <= threeDaysLater)
             && check_event_type(props.regular_wp, event)
             && check_format(props.format, event)
