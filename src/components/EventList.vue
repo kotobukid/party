@@ -83,7 +83,7 @@ const events_to_show = computed((): Record<string, EventDetail[]> => {
     <tr class="date">
       <td colspan="4">{{ date }}</td>
     </tr>
-    <tr v-for="event in events" :key="event.name">
+    <tr v-for="event in events" :key="`${event.time_s}_${event.shop_name}_${event.name}`">
       <td :data-format="event.format">{{ event.format }}</td>
       <td>{{ event.time_s }}</td>
       <td>
