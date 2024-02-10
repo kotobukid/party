@@ -23,6 +23,8 @@ type EventDetail = {
 
 type EventDetailOnServer = Omit<EventDetail, "is_regular_wp">
 
+const load_first: Ref<boolean> = ref(false);
+
 const events_all: Ref<EventDetail[]> = ref([]);
 
 onMounted(async () => {
@@ -33,6 +35,7 @@ onMounted(async () => {
       is_regular_wp: e.name.startsWith("WIXOSS PARTY")
     };
   });
+  load_first.value = true;
 });
 
 const check_event_type = (filter: 0 | 1 | 2, e: EventDetail): boolean => {
@@ -130,7 +133,12 @@ const no_events = computed(() => {
       <td>{{ event.name }}</td>
     </tr>
     </tbody>
-    <tbody v-if="no_events">
+    <tbody v-if="no_events && !load_first">
+    <tr>
+      <td colspan="4">読み込み中です</td>
+    </tr>
+    </tbody>
+    <tbody v-if="no_events && load_first">
     <tr>
       <td colspan="4">イベントがありません</td>
     </tr>
