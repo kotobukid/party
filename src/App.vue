@@ -6,6 +6,7 @@ import AppConfiguration from "./components/AppConfiguration.vue";
 
 const show_config: Ref<boolean> = ref(false);
 const show_limit: Ref<number> = ref(0);
+const regular_wp: Ref<0 | 1 | 2> = ref(0);
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'F1') {
@@ -20,9 +21,14 @@ document.addEventListener('keydown', (event) => {
     <AppConfiguration
         v-if="show_config"
         :show_limit="show_limit"
-        @limit-changed="(l) => {show_limit = l}"
+        :regular_wp="regular_wp"
+        @limit-changed="(l: number) => {show_limit = l}"
+        @regular-wp-changed="(b: 0 | 1 | 2) => {regular_wp = b}"
     ></AppConfiguration>
-    <EventList :show_limit="show_limit"/>
+    <EventList
+      :show_limit="show_limit"
+      :regular_wp="regular_wp"
+    />
   </div>
 </template>
 

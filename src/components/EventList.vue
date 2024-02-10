@@ -3,7 +3,8 @@ import {computed, onMounted, ref, type Ref} from "vue";
 import {invoke} from "@tauri-apps/api/tauri";
 
 const props = defineProps<{
-  show_limit: number
+  show_limit: number,
+  regular_wp: 0 | 1 | 2
 }>()
 
 console.log(props.show_limit);
@@ -16,15 +17,32 @@ type EventDetail = {
   time_s: string,
   datetime: Date,
   format: string,
+  is_regular_wp: boolean
 };
+
+type EventDetailOnServer = Omit<EventDetail, "is_regular_wp">
 
 const events_all: Ref<EventDetail[]> = ref([]);
 
 onMounted(async () => {
-  const events: EventDetail[] = await invoke("fetch_events");
-  events_all.value = events;
+  const events: EventDetailOnServer[] = await invoke("fetch_events");
+  events_all.value = events.map(e => {
+    return {
+      ...e,
+      is_regular_wp: e.name.startsWith("WIXOSS PARTY")
+    };
+  });
 });
 
+const check_event_type = (filter: 0 | 1 | 2, e: EventDetail): boolean => {
+  if (props.regular_wp === 0) {
+    return true;
+  } else if (props.regular_wp === 1) {
+    return e.is_regular_wp;
+  } else {
+    return !e.is_regular_wp;
+  }
+}
 
 const events_to_show = computed((): Record<string, EventDetail[]> => {
   const now = new Date();
@@ -36,7 +54,8 @@ const events_to_show = computed((): Record<string, EventDetail[]> => {
   const filteredAndSortedEvents = events_all.value
       .filter(event => {
         const eventDate = new Date(event.datetime);
-        return eventDate >= now && eventDate <= threeDaysLater;
+        return (eventDate >= now && eventDate <= threeDaysLater)
+            && check_event_type(props.regular_wp, event)
       })
       .sort((a, b) => {
         const dateA = new Date(a.datetime);
