@@ -4,7 +4,8 @@ import {invoke} from "@tauri-apps/api/tauri";
 
 const props = defineProps<{
   show_limit: number,
-  regular_wp: 0 | 1 | 2
+  regular_wp: 0 | 1 | 2,
+  format: 0 | 1 | 2 | 3
 }>()
 
 console.log(props.show_limit);
@@ -35,12 +36,24 @@ onMounted(async () => {
 });
 
 const check_event_type = (filter: 0 | 1 | 2, e: EventDetail): boolean => {
-  if (props.regular_wp === 0) {
+  if (filter === 0) {
     return true;
-  } else if (props.regular_wp === 1) {
+  } else if (filter === 1) {
     return e.is_regular_wp;
   } else {
     return !e.is_regular_wp;
+  }
+};
+
+const check_format = (filter: 0 | 1 | 2 | 3, e: EventDetail): boolean => {
+  if (filter === 0) {
+    return true;
+  } else if (filter === 1) {
+    return e.format === 'オールスター';
+  } else if (filter === 2) {
+    return e.format === 'キーセレクション';
+  } else {
+    return e.format === 'ディーヴァセレクション';
   }
 }
 
@@ -54,8 +67,10 @@ const events_to_show = computed((): Record<string, EventDetail[]> => {
   const filteredAndSortedEvents = events_all.value
       .filter(event => {
         const eventDate = new Date(event.datetime);
+        console.log(event.format)
         return (eventDate >= now && eventDate <= threeDaysLater)
             && check_event_type(props.regular_wp, event)
+            && check_format(props.format, event)
       })
       .sort((a, b) => {
         const dateA = new Date(a.datetime);
@@ -79,6 +94,10 @@ const events_to_show = computed((): Record<string, EventDetail[]> => {
     return groups;
   }, {} as { [key: string]: EventDetail[] });
   return groupedEvents;
+});
+
+const no_events = computed(() => {
+  return Object.keys(events_to_show.value).length === 0;
 });
 </script>
 
@@ -110,6 +129,11 @@ const events_to_show = computed((): Record<string, EventDetail[]> => {
         <a target="_blank" :href="event.shop_link">{{ event.shop_name }}</a>
       </td>
       <td>{{ event.name }}</td>
+    </tr>
+    </tbody>
+    <tbody v-if="no_events">
+    <tr>
+      <td colspan="4">イベントがありません</td>
     </tr>
     </tbody>
   </table>

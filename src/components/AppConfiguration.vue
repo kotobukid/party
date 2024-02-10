@@ -1,12 +1,14 @@
 <script setup lang="ts">
 const emit = defineEmits([
     'limit-changed',
-    'regular-wp-changed'
+    'regular-wp-changed',
+    'format-changed'
 ]);
 
 const props = defineProps<{
   show_limit: number,
-  regular_wp: 0 | 1 | 2
+  regular_wp: 0 | 1 | 2,
+  format: 0 | 1 | 2 | 3
 }>();
 
 const show_limit_changed = (e: InputEvent) => {
@@ -21,6 +23,10 @@ const regular_wp_changed = (e: InputEvent) => {
   const limit = Number(e.target!.value!);
 
   emit('regular-wp-changed', limit);
+}
+const format_changed = (format: 0 | 1 | 2 | 3) => {
+
+  emit('format-changed', format);
 }
 </script>
 
@@ -41,9 +47,19 @@ const regular_wp_changed = (e: InputEvent) => {
       option(value="0") 指定なし
       option(value="1") 通常WP
       option(value="2") 特別イベント
+  .formats
+    span フォーマット
+    a(href="#" :class="props.format == 0 ? 'active' : ''" title="指定なし" @click.prevent="format_changed(0)")
+      img(src="/any.svg")
+    a(href="#" :class="props.format == 1 ? 'active' : ''" title="オールスター" @click.prevent="format_changed(1)")
+      img(src="/all_star.svg")
+    a(href="#" :class="props.format == 2 ? 'active' : ''" title="キーセレクション" @click.prevent="format_changed(2)")
+      img(src="/key_selection.svg")
+    a(href="#" :class="props.format == 3 ? 'active' : ''" title="ディーヴァセレクション" @click.prevent="format_changed(3)")
+      img(src="/diva_selection.svg")
 </template>
 
-<style scoped>
+<style scoped lang="less">
 .configuration {
   border-radius: 4px;
   border: 1px solid grey;
@@ -56,12 +72,34 @@ label {
 }
 
 input, select {
-  margi-left: 4px;
+  margin-left: 4px;
   font-size: 1.2rem;
   padding: 6px;
   outline: 0 solid transparent;
   border: 1px solid #686868;
   border-radius: 4px;
   box-shadow: none;
+}
+
+.formats {
+  display: inline-block;
+
+  a {
+    margin-top: 4px;
+    border: 1px solid transparent;
+    background-color: transparent;
+    padding: 5px 2px 0 2px;
+    border-radius: 2px;
+
+    &.active {
+      border-color: red;
+      background-color: pink;
+    }
+
+    img {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
 }
 </style>

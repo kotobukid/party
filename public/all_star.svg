@@ -1,0 +1,10 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1 Basic//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-basic.dtd" [
+	<!ENTITY ns_svg "http://www.w3.org/2000/svg">
+	<!ENTITY ns_xlink "http://www.w3.org/1999/xlink">
+]>
+<svg  version="1.1" baseProfile="basic" id="&#x30EC;&#x30A4;&#x30E4;&#x30FC;_1" xmlns="&ns_svg;"
+	 width="500" height="500" viewBox="0 0 500 500" overflow="visible" enable-background="new 0 0 500 500" xml:space="preserve">
+<polygon fill="#FF4D05" stroke="#000000" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="1" points="
+	250,66.664 309.569,187.365 442.771,206.72 346.385,300.673 369.139,433.336 250,370.701 130.861,433.336 153.615,300.673 
+	57.229,206.72 190.432,187.365 "/>
+</svg>
