@@ -19,6 +19,42 @@ extern crate party;
 
 use party::parse_and_adjust_date;
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EventDetail {
+    name: String,
+    con: String,
+    shop_name: String,
+    shop_link: String,
+    time_s: String,
+    datetime: DateTime<Local>,
+    format: String,
+}
+
+impl Display for EventDetail {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}\n\t{}\n\t{}\n\t{}\n\t{}", self.name, self.shop_name, self.shop_link, self.time_s, self.format)
+        // write!(f, "{}", serde_json::to_string(self).unwrap())
+    }
+}
+
+#[derive(Debug)]
+pub struct EventGroup {
+    pub date: String,
+    pub events: Vec<EventDetail>,
+}
+
+fn ensure_cache_dir_exists(cache_dir: &str) -> std::io::Result<()> {
+    fs::create_dir_all(cache_dir)
+}
+
+async fn save_to_cache(cache_dir: &str, cache_filename: &str, content: &str) -> std::io::Result<()> {
+    ensure_cache_dir_exists(cache_dir).unwrap();
+    let path = Path::new(cache_dir).join(cache_filename);
+    let mut file = File::create(&path)?;
+    file.write_all(content.as_bytes())?;
+    Ok(())
+}
+
 pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<EventDetail>, Box<dyn std::error::Error>> {
     let cache_dir = "./cache";
     let cache_filename = format!("{}.txt", get_today());
@@ -72,89 +108,6 @@ pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<EventD
         });
     });
     Ok(event_details)
-
-    // for e in events {
-    //     println!("{}\n", e);
-    // }
-    //
-    // Ok(())
-}
-
-
-pub async fn filter_events_in_days_range(root_selector: Vec<String>, days: i64) -> Result<Vec<EventDetail>, Box<dyn std::error::Error>> {
-    let all_events = use_cache_or_fetch(root_selector).await?;
-
-    let now = Utc::now().with_timezone(&Tokyo);
-    let future = now + Duration::days(days);
-
-    let filtered_events: Vec<EventDetail> = all_events.into_iter()
-        .filter(|event| {
-            event.datetime >= now && event.datetime <= future
-        })
-        .collect();
-
-    Ok(filtered_events)
-}
-
-#[derive(Debug)]
-pub struct EventGroup {
-    pub date: String,
-    pub events: Vec<EventDetail>,
-}
-
-pub async fn group_events_by_day_asc(root_selector: Vec<String>, days: i64) -> Result<Vec<EventGroup>, Box<dyn std::error::Error>> {
-    if days < 0 {
-        return Err(Box::new(std::io::Error::new(std::io::ErrorKind::InvalidInput, "日数が無効です")));
-    }
-
-    let all_events = filter_events_in_days_range(root_selector, days).await?;
-    let grouped_events: HashMap<_, Vec<_>> = all_events.into_iter()
-        .fold(HashMap::new(), |mut acc: HashMap<_, Vec<_>>, event| {
-            acc.entry(event.datetime.date_naive())
-                .or_insert_with(|| Vec::new())
-                .push(event);
-            acc
-        });
-
-    let mut result: Vec<EventGroup> = grouped_events.into_iter()
-        .map(|(date, events)| EventGroup {
-            date: date.format("%Y/%m/%d").to_string(),
-            events: events
-        })
-        .collect();
-    result.sort_by(|a, b| a.date.cmp(&b.date));
-
-    Ok(result)
-}
-
-fn ensure_cache_dir_exists(cache_dir: &str) -> std::io::Result<()> {
-    fs::create_dir_all(cache_dir)
-}
-
-async fn save_to_cache(cache_dir: &str, cache_filename: &str, content: &str) -> std::io::Result<()> {
-    ensure_cache_dir_exists(cache_dir).unwrap();
-    let path = Path::new(cache_dir).join(cache_filename);
-    let mut file = File::create(&path)?;
-    file.write_all(content.as_bytes())?;
-    Ok(())
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct EventDetail {
-    name: String,
-    con: String,
-    shop_name: String,
-    shop_link: String,
-    time_s: String,
-    datetime: DateTime<Local>,
-    format: String,
-}
-
-impl Display for EventDetail {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}\n\t{}\n\t{}\n\t{}\n\t{}", self.name, self.shop_name, self.shop_link, self.time_s, self.format)
-        // write!(f, "{}", serde_json::to_string(self).unwrap())
-    }
 }
 
 fn parse_event<'a>(src: &'a str, con_name: String) -> EventDetail {
@@ -213,4 +166,57 @@ fn get_today() -> String {
     let formatted = jst_now.format("%Y%m%d").to_string();
 
     format!("{}", formatted)
+}
+
+pub async fn filter_events_in_days_range(root_selector: Vec<String>, days: i64) -> Result<Vec<EventDetail>, Box<dyn std::error::Error>> {
+    let all_events = use_cache_or_fetch(root_selector).await?;
+
+    let now = Utc::now().with_timezone(&Tokyo);
+    let future = now + Duration::days(days);
+
+    let filtered_events: Vec<EventDetail> = all_events.into_iter()
+        .filter(|event| {
+            event.datetime >= now && event.datetime <= future
+        })
+        .collect();
+
+    Ok(filtered_events)
+}
+
+pub async fn group_events_by_day_asc(root_selector: Vec<String>, days: i64) -> Result<Vec<EventGroup>, Box<dyn std::error::Error>> {
+    if days < 0 {
+        return Err(Box::new(std::io::Error::new(std::io::ErrorKind::InvalidInput, "日数が無効です")));
+    }
+
+    let all_events = filter_events_in_days_range(root_selector, days).await?;
+    let grouped_events: HashMap<_, Vec<_>> = all_events.into_iter()
+        .fold(HashMap::new(), |mut acc: HashMap<_, Vec<_>>, event| {
+            acc.entry(event.datetime.date_naive())
+                .or_insert_with(|| Vec::new())
+                .push(event);
+            acc
+        });
+
+    let mut result: Vec<EventGroup> = grouped_events.into_iter()
+        .map(|(date, events)| EventGroup {
+            date: date.format("%Y/%m/%d").to_string(),
+            events: events,
+        })
+        .collect();
+    result.sort_by(|a, b| a.date.cmp(&b.date));
+
+    Ok(result)
+}
+
+
+#[tokio::main]
+async fn main() {
+    let root_selectors: Vec<String> = dotenv::var("WX_SEL").unwrap_or("fukuoka".to_string()).split(',').into_iter().map(|s| s.trim().to_owned()).collect();
+    let events = group_events_by_day_asc(root_selectors, 3).await;
+    events.unwrap_or(vec![]).iter().for_each(|es| {
+        println!("{}", es.date);
+        es.events.iter().for_each(|e| {
+            println!("{}", e)
+        })
+    });
 }
