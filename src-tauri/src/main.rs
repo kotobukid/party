@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod scraping;
+mod shiromado;
 
 use dotenv::dotenv;
 use std::env;
@@ -13,6 +14,8 @@ async fn fetch_events() -> Vec<scraping::EventDetail> {
 
     let key = "WX_SEL";
     let root_selectors: Vec<String> = dotenv::var(key).unwrap_or("fukuoka".to_string()).split(',').into_iter().map(|s| s.trim().to_owned()).collect();
+
+    shiromado::use_cache_or_fetch(root_selectors.clone()).await.unwrap();
 
     scraping::use_cache_or_fetch(root_selectors).await.unwrap()
 }

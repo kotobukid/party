@@ -131,7 +131,7 @@ fn ensure_cache_dir_exists(cache_dir: &str) -> std::io::Result<()> {
     fs::create_dir_all(cache_dir)
 }
 
-async fn save_to_cache(cache_dir: &str, cache_filename: &str, content: &str) -> std::io::Result<()> {
+pub(crate) async fn save_to_cache(cache_dir: &str, cache_filename: &str, content: &str) -> std::io::Result<()> {
     ensure_cache_dir_exists(cache_dir).unwrap();
     let path = Path::new(cache_dir).join(cache_filename);
     let mut file = File::create(&path)?;
@@ -188,7 +188,7 @@ fn parse_event<'a>(src: &'a str, con_name: String) -> EventDetail {
     }
 }
 
-fn cache_check(dir: &str, filename: &str) -> Result<String, std::io::Error> {
+pub(crate) fn cache_check(dir: &str, filename: &str) -> Result<String, std::io::Error> {
     let path: PathBuf = PathBuf::from(format!("{}/{}", dir, filename));
     if path.exists() {
         println!("cache found");
@@ -202,7 +202,7 @@ fn cache_check(dir: &str, filename: &str) -> Result<String, std::io::Error> {
     }
 }
 
-fn get_today() -> String {
+pub(crate) fn get_today() -> String {
     // 現在のUTC時刻を取得
     let utc_now = Utc::now();
 
