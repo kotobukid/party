@@ -107,10 +107,10 @@ const no_events = computed(() => {
 <template>
   <table>
     <colgroup>
-      <col style="width: 200px;"/>
-      <col style="width: 170px;"/>
-      <col style="width: 300px;"/>
-      <col style="width: 345px;"/>
+      <col style="width: 222px;"/>
+      <col style="width: 210px;"/>
+      <col style="width: 370px;"/>
+      <col style="width: 371px;"/>
     </colgroup>
     <thead>
     <tr>
@@ -124,12 +124,12 @@ const no_events = computed(() => {
     <tr class="date">
       <td colspan="4">{{ date }}</td>
     </tr>
-    <tr v-for="event in events" :key="`${event.time_s}_${event.shop}_${event.name}`">
+    <tr class="event" v-for="event in events" :key="`${event.time_s}_${event.shop}_${event.name}`">
       <td :data-format="event.format">{{ event.format }}</td>
       <td>{{ event.time_s }}</td>
       <td>
-        <span class="con">{{ event.state }}</span>
         <a target="_blank" :href="event.url">{{ event.shop }}</a>
+        <span class="con">{{ event.state }}</span>
       </td>
       <td>{{ event.name }}</td>
     </tr>
@@ -149,7 +149,7 @@ const no_events = computed(() => {
 
 <style scoped>
 table {
-  width: 1170px;
+  width: 1173px;
   table-layout: fixed;
   border-collapse: collapse;
 }
@@ -174,7 +174,7 @@ td {
   text-align: left;
 }
 
-tr:hover {
+tr.event:hover td {
   background-color: lightgreen;
 }
 
@@ -188,15 +188,14 @@ a {
 }
 
 span.con {
-  display: inline-block;
-  width: 4rem;
-  text-align: center;
-  border: 1px solid grey;
-  background-color: white;
-  border-radius: 5px;
-  padding: 5px;
-  margin-right: 5px;
+  margin-left: 5px;
   color: black;
+  &:before {
+    content: '(';
+  }
+  &:after {
+    content: ')';
+  }
 }
 
 td[data-format="オールスター"] {
