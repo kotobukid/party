@@ -242,7 +242,7 @@ mod tests {
 }
 
 
-enum ShiromadoCategory {
+pub enum ShiromadoCategory {
     Gachi,
     Casual,
     Unknown,
@@ -271,17 +271,17 @@ impl Display for ShiromadoCategory {
 }
 
 pub struct ShiromadoEvent {
-    name: String,
-    url: String,
-    area: String,
-    state: State,
-    community: String,
-    location: String,
-    time_s: String,
-    date: String,
-    owner: String,
-    players: String,
-    category: ShiromadoCategory,
+    pub name: String,
+    pub url: String,
+    pub area: String,
+    pub state: State,
+    pub community: String,
+    pub location: String,
+    pub time_s: String,
+    pub date: String,
+    pub owner: String,
+    pub players: String,
+    pub category: ShiromadoCategory,
 }
 
 impl Display for ShiromadoEvent {
@@ -396,7 +396,7 @@ fn parse_html(body: &str) -> Vec<ShiromadoEvent> {
     events
 }
 
-fn to_sortable_date(target: &str) -> Result<String, &'static str> {
+pub fn to_sortable_date(target: &str) -> Result<String, &'static str> {
     let re = regex::Regex::new(r"(\d+)月\s*(\d+)日").map_err(|_| "Unknown")?;
     let mat = re.captures(target).ok_or("Unknown")?;
 

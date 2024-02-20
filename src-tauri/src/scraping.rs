@@ -19,7 +19,7 @@ extern crate party;
 
 use party::parse_and_adjust_date;
 
-pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<EventDetail>, Box<dyn std::error::Error>> {
+pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<WixossPartyDetail>, Box<dyn std::error::Error>> {
     let cache_dir = "./cache";
     let cache_filename = format!("{}.txt", get_today());
 
@@ -44,7 +44,7 @@ pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<EventD
         }
     };
 
-    let mut event_details: Vec<EventDetail> = Vec::new();
+    let mut event_details: Vec<WixossPartyDetail> = Vec::new();
 
     let document: Html = Html::parse_document(&body);
 
@@ -81,13 +81,13 @@ pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<EventD
 }
 
 
-pub async fn filter_events_in_days_range(root_selector: Vec<String>, days: i64) -> Result<Vec<EventDetail>, Box<dyn std::error::Error>> {
+pub async fn filter_events_in_days_range(root_selector: Vec<String>, days: i64) -> Result<Vec<WixossPartyDetail>, Box<dyn std::error::Error>> {
     let all_events = use_cache_or_fetch(root_selector).await?;
 
     let now = Utc::now().with_timezone(&Tokyo);
     let future = now + Duration::days(days);
 
-    let filtered_events: Vec<EventDetail> = all_events.into_iter()
+    let filtered_events: Vec<WixossPartyDetail> = all_events.into_iter()
         .filter(|event| {
             event.datetime >= now && event.datetime <= future
         })
@@ -99,7 +99,7 @@ pub async fn filter_events_in_days_range(root_selector: Vec<String>, days: i64) 
 #[derive(Debug)]
 pub struct EventGroup {
     pub date: String,
-    pub events: Vec<EventDetail>,
+    pub events: Vec<WixossPartyDetail>,
 }
 
 pub async fn group_events_by_day_asc(root_selector: Vec<String>, days: i64) -> Result<Vec<EventGroup>, Box<dyn std::error::Error>> {
@@ -140,24 +140,24 @@ pub(crate) async fn save_to_cache(cache_dir: &str, cache_filename: &str, content
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct EventDetail {
-    name: String,
-    con: String,
-    shop_name: String,
-    shop_link: String,
-    time_s: String,
-    datetime: DateTime<Local>,
-    format: String,
+pub struct WixossPartyDetail {
+    pub name: String,
+    pub con: String,
+    pub shop_name: String,
+    pub shop_link: String,
+    pub time_s: String,
+    pub datetime: DateTime<Local>,
+    pub format: String,
 }
 
-impl Display for EventDetail {
+impl Display for WixossPartyDetail {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}\n\t{}\n\t{}\n\t{}\n\t{}", self.name, self.shop_name, self.shop_link, self.time_s, self.format)
         // write!(f, "{}", serde_json::to_string(self).unwrap())
     }
 }
 
-fn parse_event<'a>(src: &'a str, con_name: String) -> EventDetail {
+fn parse_event<'a>(src: &'a str, con_name: String) -> WixossPartyDetail {
     let html = Html::parse_document(src);
     let selector_event_name: Selector = Selector::parse("dd.event_name").unwrap();
     let selector_shop_name: Selector = Selector::parse("dd.shop_name a").unwrap();
@@ -177,7 +177,7 @@ fn parse_event<'a>(src: &'a str, con_name: String) -> EventDetail {
     };
     let time: String = extract_text(&selector_time);
 
-    EventDetail {
+    WixossPartyDetail {
         name: extract_text(&selector_event_name),
         con: con_name,
         shop_name: extract_text(&selector_shop_name),

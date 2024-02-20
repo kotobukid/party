@@ -12,11 +12,11 @@ console.log(props.show_limit);
 
 type EventDetail = {
   name: string,
-  con: string,
-  shop_name: string,
-  shop_link: string,
+  state: string,
+  shop: string,
+  url: string,
   time_s: string,
-  datetime: Date,
+  date: Date,
   format: string,
   is_regular_wp: boolean
 };
@@ -69,21 +69,21 @@ const events_to_show = computed((): Record<string, EventDetail[]> => {
 
   const filteredAndSortedEvents = events_all.value
       .filter(event => {
-        const eventDate = new Date(event.datetime);
+        const eventDate = new Date(event.date);
         return (eventDate >= now && eventDate <= threeDaysLater)
             && check_event_type(props.regular_wp, event)
             && check_format(props.format, event)
       })
       .sort((a, b) => {
-        const dateA = new Date(a.datetime);
-        const dateB = new Date(b.datetime);
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
         return dateA.getTime() - dateB.getTime();
       });
 
 
   // イベントを年月日でグルーピング
   const groupedEvents = filteredAndSortedEvents.reduce((groups, event) => {
-    const dateKey = new Date(event.datetime).toISOString().split('T')[0];
+    const dateKey = new Date(event.date).toISOString().split('T')[0];
 
     // グループにこの日付がまだ存在しない場合は、空の配列を用意
     if (!groups[dateKey]) {
@@ -123,12 +123,12 @@ const no_events = computed(() => {
     <tr class="date">
       <td colspan="4">{{ date }}</td>
     </tr>
-    <tr v-for="event in events" :key="`${event.time_s}_${event.shop_name}_${event.name}`">
+    <tr v-for="event in events" :key="`${event.time_s}_${event.shop}_${event.name}`">
       <td :data-format="event.format">{{ event.format }}</td>
       <td>{{ event.time_s }}</td>
       <td>
-        <span class="con">{{ event.con }}</span>
-        <a target="_blank" :href="event.shop_link">{{ event.shop_name }}</a>
+        <span class="con">{{ event.state }}</span>
+        <a target="_blank" :href="event.url">{{ event.shop }}</a>
       </td>
       <td>{{ event.name }}</td>
     </tr>
@@ -208,5 +208,14 @@ td[data-format="キーセレクション"] {
 
 td[data-format="ディーヴァセレクション"] {
   background-color: lightblue;
+}
+
+td[data-format="ガチばとる"] {
+  background-color: #103300;
+  color: white;
+}
+
+td[data-format="楽しくばとる"] {
+  background-color: #4bfa8c;
 }
 </style>
