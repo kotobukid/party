@@ -7,6 +7,7 @@ mod shiromado;
 use dotenv::dotenv;
 use std::env;
 use std::fmt::{Display, Formatter};
+use chrono::{Datelike, Local, NaiveDate, NaiveDateTime};
 use serde::Serialize;
 use crate::scraping::WixossPartyDetail;
 use crate::shiromado::{ShiromadoEvent};
@@ -48,8 +49,11 @@ impl Display for GenericEvent {
         write!(f, "{}", self.name)
     }
 }
+
 impl From<WixossPartyDetail> for GenericEvent {
     fn from(value: WixossPartyDetail) -> Self {
+        let date =  value.datetime.format("%Y-%m-%d").to_string();
+
         GenericEvent {
             name: value.name,
             time_s: value.time_s,
@@ -57,13 +61,46 @@ impl From<WixossPartyDetail> for GenericEvent {
             format: value.format,
             url: value.shop_link,
             shop: value.shop_name,
-            date: value.datetime.to_string()
+            date
         }
     }
 }
 
+fn interpret_date(date_str: &str, now: NaiveDateTime) -> Option<String> {
+    if date_str.len() != 4 {
+        return None;
+    }
+
+    let mut year = now.year();
+    let month = now.month();
+
+    let target_month: u32 = date_str[0..2].parse().ok()?;
+    let target_day: u32 = date_str[2..4].parse().ok()?;
+
+    if target_month < month {
+        year += 1;
+    }
+
+    let date = NaiveDate::from_ymd_opt(year, target_month, target_day);
+
+    match date {
+        Some(d) => Some(format!("{}", d.format("%Y-%m-%d"))),
+        None => None
+    }
+}
+
+fn parse_date_or_unknown(date_str: &str, now: NaiveDateTime) -> String {
+    let result = interpret_date(date_str, now);
+    result.unwrap_or_else(|| "Unknown".to_string())
+}
+
+
 impl From<ShiromadoEvent> for GenericEvent {
     fn from(value: ShiromadoEvent) -> Self {
+        let today = Local::now();
+        let start_of_day = NaiveDate::from_ymd_opt(today.year(), today.month(), today.day()).unwrap().and_hms_opt(0, 0, 0).unwrap();
+        let date = parse_date_or_unknown(&value.date, start_of_day);
+
         GenericEvent {
             name: value.name,
             time_s: value.time_s.clone(),
@@ -71,7 +108,7 @@ impl From<ShiromadoEvent> for GenericEvent {
             format: value.category.to_string(),
             url: value.url,
             shop: value.community,
-            date: value.date
+            date
         }
     }
 }

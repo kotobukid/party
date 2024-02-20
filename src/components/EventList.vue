@@ -5,7 +5,7 @@ import {invoke} from "@tauri-apps/api/tauri";
 const props = defineProps<{
   show_limit: number,
   regular_wp: 0 | 1 | 2,
-  format: 0 | 1 | 2 | 3
+  format: 0 | 1 | 2 | 3 | 4
 }>()
 
 type EventDetail = {
@@ -27,6 +27,7 @@ const events_all: Ref<EventDetail[]> = ref([]);
 
 onMounted(async () => {
   const events: EventDetailOnServer[] = await invoke("fetch_events");
+
   events_all.value = events.map(e => {
     return {
       ...e,
@@ -46,15 +47,17 @@ const check_event_type = (filter: 0 | 1 | 2, e: EventDetail): boolean => {
   }
 };
 
-const check_format = (filter: 0 | 1 | 2 | 3, e: EventDetail): boolean => {
+const check_format = (filter: 0 | 1 | 2 | 3 | 4, e: EventDetail): boolean => {
   if (filter === 0) {
     return true;
   } else if (filter === 1) {
     return e.format === 'オールスター';
   } else if (filter === 2) {
     return e.format === 'キーセレクション';
-  } else {
+  } else if (filter === 3) {
     return e.format === 'ディーヴァセレクション';
+  } else {
+    return e.format === 'ガチばとる' || e.format === '楽しくばとる';
   }
 }
 
@@ -63,12 +66,12 @@ const events_to_show = computed((): Record<string, EventDetail[]> => {
 
   const limit = props.show_limit === 0 ? 30 : props.show_limit + 1;
 
-  const threeDaysLater = new Date(now.getFullYear(), now.getMonth(), now.getDate() + limit);
+  const XDaysLater = new Date(now.getFullYear(), now.getMonth(), now.getDate() + limit);
 
   const filteredAndSortedEvents = events_all.value
       .filter(event => {
         const eventDate = new Date(event.date);
-        return (eventDate >= now && eventDate <= threeDaysLater)
+        return (eventDate >= now && eventDate <= XDaysLater)
             && check_event_type(props.regular_wp, event)
             && check_format(props.format, event)
       })

@@ -8,7 +8,7 @@ const emit = defineEmits([
 const props = defineProps<{
   show_limit: number,
   regular_wp: 0 | 1 | 2,
-  format: 0 | 1 | 2 | 3
+  format: 0 | 1 | 2 | 3 | 4
 }>();
 
 const show_limit_changed = (e: InputEvent) => {
@@ -24,7 +24,7 @@ const regular_wp_changed = (e: InputEvent) => {
 
   emit('regular-wp-changed', regular_wp);
 }
-const format_changed = (format: 0 | 1 | 2 | 3) => {
+const format_changed = (format: 0 | 1 | 2 | 3 | 4) => {
   emit('format-changed', format);
 }
 </script>
@@ -56,6 +56,8 @@ const format_changed = (format: 0 | 1 | 2 | 3) => {
       img(src="/key_selection.svg")
     a(href="#" :class="props.format == 3 ? 'active' : ''" title="ディーヴァセレクション" @click.prevent="format_changed(3)")
       img(src="/diva_selection.svg")
+    a(href="#" :class="props.format == 4 ? 'active' : ''" title="白窓の部屋" @click.prevent="format_changed(4)")
+      span 白
 </template>
 
 <style scoped lang="less">

@@ -7,7 +7,7 @@ import AppConfiguration from "./components/AppConfiguration.vue";
 let show_config = ref<boolean>(false);
 const show_limit = ref<number>(0);
 const regular_wp = ref<0 | 1 | 2>(0);
-const format = ref<0 | 1 | 2 | 3>(0);
+const format = ref<0 | 1 | 2 | 3 | 4>(0);
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'F1') {
@@ -34,7 +34,7 @@ onMounted(() => {
   temp = localStorage.getItem('wx-party.format');
   let parsedFormat = temp ? parseInt(temp) : null;
   // @ts-ignore
-  format.value = (parsedFormat !== null && [0, 1, 2, 3].includes(parsedFormat)) ? parsedFormat : defaultFormat;
+  format.value = (parsedFormat !== null && [0, 1, 2, 3, 4].includes(parsedFormat)) ? parsedFormat : defaultFormat;
 });
 
 const limit_changed = (limit: number) => {
@@ -48,7 +48,7 @@ const regular_wp_changed = (wp: 0 | 1 | 2) => {
   regular_wp.value = wp;
 };
 
-const format_changed = (f: 0 | 1 | 2 | 3) => {
+const format_changed = (f: 0 | 1 | 2 | 3 | 4) => {
   localStorage.setItem('wx-party.format', f.toString());
   format.value = f;
 };

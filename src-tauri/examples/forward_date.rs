@@ -11,7 +11,7 @@ fn interpret_date(date_str: &str, now: NaiveDateTime) -> Option<String> {
     let target_month: u32 = date_str[0..2].parse().ok()?;
     let target_day: u32 = date_str[2..4].parse().ok()?;
 
-    if target_month != month {
+    if target_month < month {
         year += 1;
     }
 
@@ -39,6 +39,7 @@ mod tests {
         assert_eq!(interpret_date("0120", NaiveDate::from_ymd_opt(2023, 1, 1).unwrap().and_hms_opt(0, 0, 0).unwrap()), Some("20230120".to_string()));
         assert_eq!(parse_date_or_unknown("0229", NaiveDate::from_ymd_opt(2023, 2, 1).unwrap().and_hms_opt(0, 0, 0).unwrap()), "Unknown".to_string());
         assert_eq!(parse_date_or_unknown("0229", NaiveDate::from_ymd_opt(2024, 2, 1).unwrap().and_hms_opt(0, 0, 0).unwrap()), "20240229".to_string());
+        assert_eq!(parse_date_or_unknown("0301", NaiveDate::from_ymd_opt(2024, 2, 1).unwrap().and_hms_opt(0, 0, 0).unwrap()), "20240301".to_string());
         assert_eq!(parse_date_or_unknown("1301", NaiveDate::from_ymd_opt(2023, 12, 1).unwrap().and_hms_opt(0, 0, 0).unwrap()), "Unknown".to_string());
         assert_eq!(parse_date_or_unknown("1232", NaiveDate::from_ymd_opt(2023, 12, 1).unwrap().and_hms_opt(0, 0, 0).unwrap()), "Unknown".to_string());
         assert_eq!(parse_date_or_unknown("abcd", NaiveDate::from_ymd_opt(2023, 12, 1).unwrap().and_hms_opt(0, 0, 0).unwrap()), "Unknown".to_string());
