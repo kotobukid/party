@@ -57,7 +57,7 @@ const format_changed = (format: 0 | 1 | 2 | 3 | 4) => {
     a(href="#" :class="props.format == 3 ? 'active' : ''" title="ディーヴァセレクション" @click.prevent="format_changed(3)")
       img(src="/diva_selection.svg")
     a(href="#" :class="props.format == 4 ? 'active' : ''" title="白窓の部屋" @click.prevent="format_changed(4)")
-      span 白
+      img(src="/shiromado.svg")
 </template>
 
 <style scoped lang="less">
