@@ -5,7 +5,7 @@ import EventList from "./components/EventList.vue";
 import AppConfiguration from "./components/AppConfiguration.vue";
 
 let show_config = ref<boolean>(false);
-const show_limit = ref<0 | 1 | 2>(0);
+const show_limit = ref<number>(0);
 const regular_wp = ref<0 | 1 | 2>(0);
 const format = ref<0 | 1 | 2 | 3>(0);
 
@@ -24,7 +24,7 @@ onMounted(() => {
   let temp = localStorage.getItem('wx-party.limit');
   let parsedLimit = temp ? parseInt(temp) : null;
   // @ts-ignore
-  show_limit.value = (parsedLimit !== null && [0, 1, 2].includes(parsedLimit)) ? parsedLimit : defaultLimit;
+  show_limit.value = (parsedLimit !== null) ? parsedLimit : defaultLimit;
 
   temp = localStorage.getItem('wx-party.regular-wp');
   let parsedRegularWp = temp ? parseInt(temp) : null;
@@ -37,7 +37,7 @@ onMounted(() => {
   format.value = (parsedFormat !== null && [0, 1, 2, 3].includes(parsedFormat)) ? parsedFormat : defaultFormat;
 });
 
-const limit_changed = (limit: 0 | 1 | 2) => {
+const limit_changed = (limit: number) => {
   localStorage.setItem("wx-party.limit", limit.toString());
 
   show_limit.value = limit;
