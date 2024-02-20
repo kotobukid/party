@@ -436,7 +436,7 @@ pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<Shirom
             let body = res.text().await?;
 
             if crate::scraping::save_to_cache(&cache_dir, &cache_filename, &body).await.is_ok() {
-                println!("キャッシュに保存成功");
+                // println!("キャッシュに保存成功");
             } else {
                 println!("キャッシュに保存失敗");
             }
@@ -451,10 +451,6 @@ pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<Shirom
     let filtered_events: Vec<ShiromadoEvent> = all_events.into_iter()
         .filter(|event| categories.contains(&event.state))
         .collect();
-
-    for a in &filtered_events {
-        println!("{}", a);
-    }
 
     Ok(filtered_events)
 }

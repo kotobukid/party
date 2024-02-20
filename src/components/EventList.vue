@@ -8,8 +8,6 @@ const props = defineProps<{
   format: 0 | 1 | 2 | 3
 }>()
 
-console.log(props.show_limit);
-
 type EventDetail = {
   name: string,
   state: string,

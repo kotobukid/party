@@ -90,9 +90,9 @@ async fn fetch_events() -> Result<Vec<GenericEvent>, tauri::InvokeError> {
     let scraping_events = scraping::use_cache_or_fetch(root_selectors).await.map_err(|e| tauri::InvokeError::from(e.to_string()))?;
     events.extend(scraping_events.into_iter().map(GenericEvent::from));
     
-    events.iter().for_each(|e| {
-        println!("{}", e)
-    });
+    // events.iter().for_each(|e| {
+    //     println!("{}", e)
+    // });
     
     Ok(events)
 }

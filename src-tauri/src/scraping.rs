@@ -191,7 +191,7 @@ fn parse_event<'a>(src: &'a str, con_name: String) -> WixossPartyDetail {
 pub(crate) fn cache_check(dir: &str, filename: &str) -> Result<String, std::io::Error> {
     let path: PathBuf = PathBuf::from(format!("{}/{}", dir, filename));
     if path.exists() {
-        println!("cache found");
+        // println!("cache found");
         let mut file: File = File::open(&path)?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
