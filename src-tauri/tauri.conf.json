@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "party",
-    "version": "0.0.0"
+    "version": "0.0.1"
   },
   "tauri": {
     "allowlist": {
@@ -20,7 +20,7 @@
     },
     "bundle": {
       "active": true,
-      "targets": "all",
+      "targets": "msi",
       "identifier": "jp.daqua.party",
       "icon": [
         "icons/32x32.png",
