@@ -64,7 +64,7 @@ const check_format = (filter: 0 | 1 | 2 | 3 | 4, e: EventDetail): boolean => {
 const events_to_show = computed((): Record<string, EventDetail[]> => {
   const now = new Date();
 
-  const limit = props.show_limit === 0 ? 30 : props.show_limit + 1;
+  const limit = props.show_limit === 0 ? 62 : props.show_limit + 1;
 
   const XDaysLater = new Date(now.getFullYear(), now.getMonth(), now.getDate() + limit);
 
