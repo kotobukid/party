@@ -50,18 +50,29 @@ pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<Wixoss
 
     let mut con_map: HashMap<String, String> = HashMap::new();
 
-    root_selector.iter().for_each(|s| {
+    for s in &root_selector {
         let con_name = con_map.get(s);
         let con_name = match con_name {
             Some(con_name) => con_name.clone(),
             None => {
                 let con = format!("#option_{}", s);
                 let con_selector: Selector = Selector::parse(&con).unwrap();
-                let con_name = document.select(&con_selector).next().unwrap().inner_html();
-                con_map.insert(s.clone(), con_name.clone());
-                con_name
+                let con_name = document.select(&con_selector).next();
+
+                match con_name {
+                    Some(con) => {
+                        let con_name = con.inner_html();
+                        con_map.insert(s.clone(), con_name.clone());
+                        con_name
+                    },
+                    None => "".to_string()
+                }
             }
         };
+
+        if con_name.is_empty() {
+            continue;
+        }
 
         let selector = format!("#detail_cont_inner_{} .event_box", s).as_str().to_owned();
         let main_selector: Selector = Selector::parse(&selector).unwrap();
@@ -70,14 +81,9 @@ pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<Wixoss
         document.select(&main_selector).into_iter().for_each(|c| {
             event_details.push(parse_event(&c.inner_html(), con_name.clone()))
         });
-    });
-    Ok(event_details)
+    };
 
-    // for e in events {
-    //     println!("{}\n", e);
-    // }
-    //
-    // Ok(())
+    Ok(event_details)
 }
 
 

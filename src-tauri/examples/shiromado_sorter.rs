@@ -164,6 +164,7 @@ impl From<String> for State {
             "miyazaki" => State::Miyazaki,
             "kagoshima" => State::Kagoshima,
             "okinawa" => State::Okinawa,
+            "online" => State::Online,
             _ => State::Other(source)
         }
     }

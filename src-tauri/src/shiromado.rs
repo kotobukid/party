@@ -446,10 +446,21 @@ pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<Shirom
     };
 
     let all_events: Vec<ShiromadoEvent> = parse_html(&body);
-    let categories: HashSet<State> = root_selector.into_iter().map(State::from).collect();
+    let categories: HashSet<String> = root_selector.into_iter().map(|c| {
+        let state = State::from(c);
+        match state {
+            State::Other(o) => {
+                match o.as_str() {
+                    "online" => "オンライン".to_string(),
+                    _ => o
+                }
+            },
+            _ => state.to_string()
+        }
+    }).collect();
 
     let filtered_events: Vec<ShiromadoEvent> = all_events.into_iter()
-        .filter(|event| categories.contains(&event.state))
+        .filter(|event| categories.contains(&event.state.to_string()))
         .collect();
 
     Ok(filtered_events)
