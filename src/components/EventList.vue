@@ -183,7 +183,7 @@ tr:nth-child(2n) {
 }
 
 a {
-  color: darkblue;
+  color: #0000cb;
   font-weight: bolder;
 }
 
@@ -213,6 +213,7 @@ td[data-format="ディーヴァセレクション"] {
 td[data-format="ガチばとる"] {
   background-color: #103300;
   color: white;
+  border-color: white;
 }
 
 td[data-format="楽しくばとる"] {
