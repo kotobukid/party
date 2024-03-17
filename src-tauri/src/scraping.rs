@@ -20,6 +20,9 @@ extern crate party;
 use party::parse_and_adjust_date;
 
 pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<WixossPartyDetail>, Box<dyn std::error::Error>> {
+    if root_selector.contains(&"any".to_string()) {
+        return Ok(Vec::<WixossPartyDetail>::new())
+    }
     let cache_dir = "./cache";
     let cache_filename = format!("{}.txt", get_today());
 

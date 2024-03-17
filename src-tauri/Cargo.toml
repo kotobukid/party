@@ -16,7 +16,7 @@ tauri-build = { version = "1.5", features = [] }
 tauri = { version = "1.5", features = ["shell-open"] }
 reqwest = { version = "0.11.22", features = ["cookies", "multipart"] }
 tokio = { version = "1.33.0", features = ["full"] }
-scraper = "0.18.1"
+scraper = "0.19.0"
 chrono = { version = "0.4.31", features = ["serde"] }
 chrono-tz = "0.8.3"
 serde = { version = "1.0.188", features = ["derive"] }

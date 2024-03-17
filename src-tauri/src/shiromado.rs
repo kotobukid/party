@@ -56,6 +56,7 @@ pub enum State {
     Okinawa,
     Online,
     Other(String),
+    Any,
 }
 
 impl From<String> for State {
@@ -111,6 +112,7 @@ impl From<String> for State {
             "鹿児島県" => State::Kagoshima,
             "沖縄県" => State::Okinawa,
             "オンライン" => State::Online,
+            "" => State::Any,
 
             "hokkaido" => State::Hokkaido,
             "aomori" => State::Aomori,
@@ -159,6 +161,7 @@ impl From<String> for State {
             "miyazaki" => State::Miyazaki,
             "kagoshima" => State::Kagoshima,
             "okinawa" => State::Okinawa,
+            "any" => State::Any,
             _ => State::Other(source)
         }
     }
@@ -215,6 +218,7 @@ impl Display for State {
             Self::Kagoshima => "鹿児島県",
             Self::Okinawa => "沖縄県",
             Self::Online => "オンライン",
+            Self::Any => "",
             Self::Other(ss) => ss
         };
         write!(f, "{}", s)
@@ -454,14 +458,18 @@ pub async fn use_cache_or_fetch(root_selector: Vec<String>) -> Result<Vec<Shirom
                     "online" => "オンライン".to_string(),
                     _ => o
                 }
-            },
+            }
             _ => state.to_string()
         }
     }).collect();
 
-    let filtered_events: Vec<ShiromadoEvent> = all_events.into_iter()
-        .filter(|event| categories.contains(&event.state.to_string()))
-        .collect();
+    let filtered_events: Vec<ShiromadoEvent> = if categories.contains("") {
+        all_events
+    } else {
+        all_events.into_iter()
+            .filter(|event| categories.contains(&event.state.to_string()))
+            .collect()
+    };
 
     Ok(filtered_events)
 }
