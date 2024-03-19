@@ -286,6 +286,7 @@ pub struct ShiromadoEvent {
     pub owner: String,
     pub players: String,
     pub category: ShiromadoCategory,
+    pub format: String
 }
 
 impl Display for ShiromadoEvent {
@@ -365,6 +366,7 @@ fn parse_html(body: &str) -> Vec<ShiromadoEvent> {
                         let mut texts = element.select(&event_txt_selector);
                         let time_s = texts.next().unwrap();
                         let location = texts.next().unwrap();
+                        let format = texts.next().unwrap();
                         let owner = texts.next().unwrap();
                         let players = texts.next().unwrap();
                         let category = texts.next().unwrap();
@@ -374,6 +376,7 @@ fn parse_html(body: &str) -> Vec<ShiromadoEvent> {
                             name: text_to_string!(title),
                             area: current_area.trim().to_string(),
                             state: State::from(current_area.trim().to_string()),
+                            format: text_to_string!(format),
                             community: text_to_string!(community),
                             url,
                             time_s: time.clone(),
