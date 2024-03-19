@@ -62,38 +62,34 @@ const check_format = (filter: 0 | 1 | 2 | 3 | 4, e: EventDetail): boolean => {
 }
 
 const events_to_show = computed((): Record<string, EventDetail[]> => {
-  const now = new Date();
-
-  const limit = props.show_limit === 0 ? 62 : props.show_limit + 1;
-
-  const XDaysLater = new Date(now.getFullYear(), now.getMonth(), now.getDate() + limit);
+  const now = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()));
+  const limit = props.show_limit === 0 ? 62 : props.show_limit;
+  const XDaysLater = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + limit));
 
   const filteredAndSortedEvents = events_all.value
-      .filter(event => {
-        const eventDate = new Date(event.date);
-        return (eventDate >= now && eventDate <= XDaysLater)
-            && check_event_type(props.regular_wp, event)
-            && check_format(props.format, event)
-      })
-      .sort((a, b) => {
-        const dateA = new Date(a.date);
-        const dateB = new Date(b.date);
-        return dateA.getTime() - dateB.getTime();
-      });
-
+    .filter(event => {
+      // イベントの日付をUTCで解析します
+      const eventDate = new Date(Date.UTC(new Date(event.date).getUTCFullYear(), new Date(event.date).getUTCMonth(), new Date(event.date).getUTCDate()));
+      return (eventDate >= now && eventDate <= XDaysLater)
+          && check_event_type(props.regular_wp, event)
+          && check_format(props.format, event)
+    })
+    .sort((a, b) => {
+      const dateA = new Date(Date.UTC(new Date(a.date).getUTCFullYear(), new Date(a.date).getUTCMonth(), new Date(a.date).getUTCDate()));
+      const dateB = new Date(Date.UTC(new Date(b.date).getUTCFullYear(), new Date(b.date).getUTCMonth(), new Date(b.date).getUTCDate()));
+      return dateA.getTime() - dateB.getTime();
+    });
 
   // イベントを年月日でグルーピング
   const groupedEvents = filteredAndSortedEvents.reduce((groups, event) => {
-    const dateKey = new Date(event.date).toISOString().split('T')[0];
+    const dateKey = new Date(Date.UTC(new Date(event.date).getUTCFullYear(), new Date(event.date).getUTCMonth(), new Date(event.date).getUTCDate())).toISOString().split('T')[0];
 
     // グループにこの日付がまだ存在しない場合は、空の配列を用意
     if (!groups[dateKey]) {
       groups[dateKey] = [];
     }
-
     // 当該日付のグループにイベントを追加
     groups[dateKey].push(event);
-
     return groups;
   }, {} as { [key: string]: EventDetail[] });
   return groupedEvents;
@@ -190,9 +186,11 @@ a {
 span.con {
   margin-left: 5px;
   color: black;
+
   &:before {
     content: '(';
   }
+
   &:after {
     content: ')';
   }
