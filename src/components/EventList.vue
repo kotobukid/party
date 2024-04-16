@@ -15,6 +15,7 @@ type EventDetail = {
   url: string,
   time_s: string,
   date: Date,
+  category: string,
   format: string,
   is_regular_wp: boolean
 };
@@ -57,7 +58,7 @@ const check_format = (filter: 0 | 1 | 2 | 3 | 4, e: EventDetail): boolean => {
   } else if (filter === 3) {
     return e.format === 'ディーヴァセレクション';
   } else {
-    return e.format === 'ガチばとる' || e.format === '楽しくばとる';
+    return e.category === 'ガチばとる' || e.category === '楽しくばとる';
   }
 }
 
@@ -121,7 +122,10 @@ const no_events = computed(() => {
       <td colspan="4">{{ date }}</td>
     </tr>
     <tr class="event" v-for="event in events" :key="`${event.time_s}_${event.shop}_${event.name}`">
-      <td :data-format="event.format">{{ event.format }}</td>
+      <td :data-format="event.format">
+        <span :data-category="event.category"></span>
+        {{ event.format }}
+      </td>
       <td>{{ event.time_s }}</td>
       <td>
         <a target="_blank" :href="event.url">{{ event.shop }}</a>
@@ -216,5 +220,40 @@ td[data-format="ガチばとる"] {
 
 td[data-format="楽しくばとる"] {
   background-color: #4bfa8c;
+}
+
+
+span[data-category=""] {
+  &:after {
+  }
+}
+span[data-category="ガチばとる"] {
+  &:after {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    content: url('/public/gachi.png');
+    outline: 1px solid black;
+    padding: 0;
+    background-color: red;
+    margin: 0;
+    position: relative;
+    top: 4px;
+  }
+}
+
+span[data-category="楽しくばとる"] {
+  &:after {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    content: url('/public/tanoshiku.png');
+    outline: 1px solid black;
+    padding: 0;
+    background-color: red;
+    margin: 0;
+    position: relative;
+    top: 4px;
+  }
 }
 </style>

@@ -42,7 +42,7 @@ struct GenericEvent {
     date: String, // <= datetime
     //- owner: String,
     //- players: String,
-    // category: shiromado::ShiromadoCategory, // => format
+    category: String, // => format
 }
 impl Display for GenericEvent {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -59,6 +59,7 @@ impl From<WixossPartyDetail> for GenericEvent {
             time_s: value.time_s,
             state: value.con,
             format: value.format,
+            category: "".to_string(),
             url: value.shop_link,
             shop: value.shop_name,
             date
@@ -105,7 +106,8 @@ impl From<ShiromadoEvent> for GenericEvent {
             name: value.name,
             time_s: value.time_s.clone(),
             state: value.state.to_string(),
-            format: value.category.to_string(),
+            format: value.format.to_string(),
+            category: value.category.to_string(),
             url: value.url,
             shop: value.community,
             date

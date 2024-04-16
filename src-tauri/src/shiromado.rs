@@ -286,12 +286,12 @@ pub struct ShiromadoEvent {
     pub owner: String,
     pub players: String,
     pub category: ShiromadoCategory,
-    pub format: String
+    pub format: String,
 }
 
 impl Display for ShiromadoEvent {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}\n {}\n コミュニティ: {}\n URL: {}\n 開催日: {} {}\n 主催者名: {}\n 開催場所: {}\n 定員: {}\n プラン: {}\n",
+        write!(f, "{}\n {}\n コミュニティ: {}\n URL: {}\n 開催日: {} {}\n 主催者名: {}\n 開催場所: {}\n 定員: {}\n プラン: {}\n フォーマット: {}\n",
                self.state,
                self.name,
                self.community,
@@ -301,7 +301,8 @@ impl Display for ShiromadoEvent {
                self.owner,
                self.location,
                self.players,
-               self.category)
+               self.category,
+               self.format)
     }
 }
 
