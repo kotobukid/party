@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import {computed, onMounted, ref, type Ref} from "vue";
 import {invoke} from "@tauri-apps/api/tauri";
+import {
+  EventFormatAllStar,
+  EventFormatKeySelection,
+  EventFormatDivaSelection,
+  type EVENT_FORMAT, EVENT_TYPE, PartyTypeAny, PartyTypeRegular
+} from "../const.ts";
 
 const props = defineProps<{
   show_limit: number,
-  regular_wp: 0 | 1 | 2,
-  format: 0 | 1 | 2 | 3 | 4
+  regular_wp: EVENT_TYPE,
+  format: EVENT_FORMAT
 }>()
 
 type EventDetail = {
@@ -38,24 +44,24 @@ onMounted(async () => {
   load_first.value = true;
 });
 
-const check_event_type = (filter: 0 | 1 | 2, e: EventDetail): boolean => {
-  if (filter === 0) {
+const check_event_type = (filter: EVENT_TYPE, e: EventDetail): boolean => {
+  if (filter === PartyTypeAny) {
     return true;
-  } else if (filter === 1) {
+  } else if (filter === PartyTypeRegular) {
     return e.is_regular_wp;
   } else {
     return !e.is_regular_wp;
   }
 };
 
-const check_format = (filter: 0 | 1 | 2 | 3 | 4, e: EventDetail): boolean => {
+const check_format = (filter: EVENT_FORMAT, e: EventDetail): boolean => {
   if (filter === 0) {
     return true;
-  } else if (filter === 1) {
+  } else if (filter === EventFormatAllStar) {
     return e.format === 'オールスター';
-  } else if (filter === 2) {
+  } else if (filter === EventFormatKeySelection) {
     return e.format === 'キーセレクション';
-  } else if (filter === 3) {
+  } else if (filter === EventFormatDivaSelection) {
     return e.format === 'ディーヴァセレクション';
   } else {
     return e.category === 'ガチばとる' || e.category === '楽しくばとる';
@@ -68,18 +74,18 @@ const events_to_show = computed((): Record<string, EventDetail[]> => {
   const XDaysLater = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + limit));
 
   const filteredAndSortedEvents = events_all.value
-    .filter(event => {
-      // イベントの日付をUTCで解析します
-      const eventDate = new Date(Date.UTC(new Date(event.date).getUTCFullYear(), new Date(event.date).getUTCMonth(), new Date(event.date).getUTCDate()));
-      return (eventDate >= now && eventDate <= XDaysLater)
-          && check_event_type(props.regular_wp, event)
-          && check_format(props.format, event)
-    })
-    .sort((a, b) => {
-      const dateA = new Date(Date.UTC(new Date(a.date).getUTCFullYear(), new Date(a.date).getUTCMonth(), new Date(a.date).getUTCDate()));
-      const dateB = new Date(Date.UTC(new Date(b.date).getUTCFullYear(), new Date(b.date).getUTCMonth(), new Date(b.date).getUTCDate()));
-      return dateA.getTime() - dateB.getTime();
-    });
+      .filter(event => {
+        // イベントの日付をUTCで解析します
+        const eventDate = new Date(Date.UTC(new Date(event.date).getUTCFullYear(), new Date(event.date).getUTCMonth(), new Date(event.date).getUTCDate()));
+        return (eventDate >= now && eventDate <= XDaysLater)
+            && check_event_type(props.regular_wp, event)
+            && check_format(props.format, event)
+      })
+      .sort((a, b) => {
+        const dateA = new Date(Date.UTC(new Date(a.date).getUTCFullYear(), new Date(a.date).getUTCMonth(), new Date(a.date).getUTCDate()));
+        const dateB = new Date(Date.UTC(new Date(b.date).getUTCFullYear(), new Date(b.date).getUTCMonth(), new Date(b.date).getUTCDate()));
+        return dateA.getTime() - dateB.getTime();
+      });
 
   // イベントを年月日でグルーピング
   const groupedEvents = filteredAndSortedEvents.reduce((groups, event) => {
@@ -227,6 +233,7 @@ span[data-category=""] {
   &:after {
   }
 }
+
 span[data-category="ガチばとる"] {
   &:after {
     display: inline-block;
