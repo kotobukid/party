@@ -239,7 +239,7 @@ span[data-category="ガチばとる"] {
     display: inline-block;
     width: 24px;
     height: 24px;
-    content: url('/public/gachi.png');
+    content: url('/gachi.png');
     outline: 1px solid black;
     padding: 0;
     background-color: red;
@@ -254,7 +254,7 @@ span[data-category="楽しくばとる"] {
     display: inline-block;
     width: 24px;
     height: 24px;
-    content: url('/public/tanoshiku.png');
+    content: url('/tanoshiku.png');
     outline: 1px solid black;
     padding: 0;
     background-color: red;
