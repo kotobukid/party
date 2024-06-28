@@ -25,6 +25,7 @@ struct GenericEvent {
 
     // new
     shop: String,
+    community: String,
 
     // wp
     // con: String, => state
@@ -61,6 +62,7 @@ impl From<WixossPartyDetail> for GenericEvent {
             format: value.format,
             category: "".to_string(),
             url: value.shop_link,
+            community: "".to_string(),
             shop: value.shop_name,
             date
         }
@@ -110,6 +112,7 @@ impl From<ShiromadoEvent> for GenericEvent {
             category: value.category.to_string(),
             url: value.url,
             shop: value.community,
+            community: value.location,
             date
         }
     }

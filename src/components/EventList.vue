@@ -18,6 +18,7 @@ type EventDetail = {
   name: string,
   state: string,
   shop: string,
+  community: string,
   url: string,
   time_s: string,
   date: Date,
@@ -135,6 +136,7 @@ const no_events = computed(() => {
       <td>{{ event.time_s }}</td>
       <td>
         <a target="_blank" :href="event.url">{{ event.shop }}</a>
+        <span class="community" v-if="event.community"><br />{{ event.community }}</span>
         <span class="con">{{ event.state }}</span>
       </td>
       <td>{{ event.name }}</td>
@@ -204,6 +206,10 @@ span.con {
   &:after {
     content: ')';
   }
+}
+
+span.community {
+    color: #343434;
 }
 
 td[data-format="オールスター"] {
